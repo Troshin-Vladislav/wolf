@@ -8,14 +8,15 @@ Program is output list log productivity
 INSTALL:
 --------
 
-                
-1. move executable file python to /usr/local/bin 
-2. create file with name ".productivity.ord" in home user directory
+1) move executable file python to /usr/local/bin 
+2)   create file with name ".productivity.ord" in home user directory
 (program work for each user)
-                
+
 
 	$ mv wolf.py /usr/local/bin
+
 	$ touch ~/.productivity.ord
+ 
 
 USE:
 ----
