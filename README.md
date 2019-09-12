@@ -1,15 +1,16 @@
 WOLF
 ======
 
-Version 0.1.2
-Program is output list log productivity
+Version 0.1.5
+
+Program create report a productivity and output it on display
 
 
 INSTALL:
 --------
 
 1) move executable file python to /usr/local/bin 
-2)   create file with name ".productivity.ord" in home user directory
+2) create file with name ".productivity.ord" in home user directory
 (program work for each user)
 
 

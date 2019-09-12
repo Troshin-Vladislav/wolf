@@ -5,23 +5,47 @@ import datetime
 import argparse
 import os
 
-_VERSION = "0.1.2"
+_VERSION = "0.1.5"
 _FILE_NAME_ = ".productivity.ord"
 _USAGE="usage: wolf.py [-hov]? <string>"
 
 
 # Output list order file
 def order():
+	checkfile(False)
 	with open(getFileName()) as fd:
 		for line in fd:
 			print(line, end='')
 
 # Add log string in order list 
 def log(message, theme=""):
+	checkfile()
 	fd = open(getFileName(), 'a')
 	logmsg = getLog(message, theme)
 	fd.write(logmsg)
 	fd.close()
+
+# input positive answer
+def sinput():
+	answer = ''
+	while len(answer) <= 0:
+		answer = input()
+	
+	if answer[0] == 'y' or answer[0] == 'Y':
+		return True
+	
+	return False
+
+# check exist file '.productivity.ord' in home directory
+def checkfile(isCreate=True):
+	if os.path.exists(getFileName()) == False:
+		print("[warning]: file is not found")
+		if isCreate == True:
+			print("you want create file with name " + getFileName() + " ? [Y/n]: ", end='')
+			if sinput() == True:
+				fd = open(getFileName(), 'a'); fd.close()
+				return;
+		exit(0)
 
 # get file name
 def getFileName():
