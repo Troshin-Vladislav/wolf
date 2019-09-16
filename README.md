@@ -1,7 +1,13 @@
 WOLF
 ======
 
-Version 0.1.5
+Last Version 0.2.1
+
+What's new in last version
+--------------------------
+
++ add option tomorrow
++ was made optimization and refactoring
 
 Program create report a productivity and output it on display
 
@@ -29,6 +35,9 @@ OPTIONS:
 
 **-o, --order:**
 print list productivity file
+
+**--tomorrow, -r:**
+filter tomorrow date
 
 **--theme &lt;theme&gt;, -t &lt;theme&gt;:**
 specify theme
