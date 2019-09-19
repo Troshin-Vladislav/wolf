@@ -1,13 +1,14 @@
 WOLF
 ======
 
-Last Version 0.2.1
+Last Version 0.2.4
 
 What's new in last version
 --------------------------
 
-+ add option tomorrow
++ add option yesterday
 + was made optimization and refactoring
++ fix typos
 
 Program create report a productivity and output it on display
 
@@ -33,10 +34,10 @@ USE:
 OPTIONS:
 --------
 
-**-o, --order:**
+**--order, -o:**
 print list productivity file
 
-**--tomorrow, -r:**
+**--yesterday, -y:**
 filter tomorrow date
 
 **--theme &lt;theme&gt;, -t &lt;theme&gt;:**

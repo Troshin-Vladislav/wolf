@@ -5,9 +5,40 @@ import datetime
 import argparse
 import os
 
-_VERSION = "0.2.1"
+APP_NAME = "wolf"
+_VERSION = "0.2.4"
+
 _FILE_NAME_ = ".productivity.ord"
-_USAGE="usage: wolf.py [-hov]? <string>"
+_USAGE = "usage: wolf.py [-hov]? <string>"
+NL = "\n"
+
+class App():
+	# Print version program and exit
+	@staticmethod
+	def version():
+		print("wolf: v%s" % _VERSION)
+		print(" [\033[32m+\033[0m] %s" % "program split on classes")
+		print(" [\033[32m+\033[0m] %s" % "program add option yesterday")
+		print(" [\033[32m+\033[0m] %s" % "fix typos")
+		exit(0)
+
+	@staticmethod
+	def error(msg):
+		print("[error]: %s" % msg)
+
+	@staticmethod
+	def warning(msg):
+		print("[warning]: %s" % msg)
+
+	# get file name
+	@staticmethod
+	def getFileName():
+		name = os.environ['HOME'] + '/' + _FILE_NAME_
+		return name
+
+	@staticmethod
+	def message(msg):
+		print("[%s]: %s" %(APP_NAME, msg))
 
 
 class Filter():
@@ -18,53 +49,13 @@ class Filter():
 		return True
 
 	def log(self, val):
-		if self.opt.tommorow == True:
-			return val.startswith( Format.date( getTomorrow() ) )
+		if self.opt.yesterday == True:
+			return val.startswith( Format.date( getYesterday() ) )
 		return True
 
-# Output list order file
-def order(orderopt):
-	checkfile(False)
-	with open(getFileName()) as fd:
-		clog = Log(orderopt)
-		clog.readlogs(fd)
-		clog.out()
 
-	print("today: %s" % Format.strend())
-
-
-# filter order options
-def orderfilter(line, opropt):
-	result = True
-	if orderopt.tommorow == True:
-		if isTomorrow(line) == False:
-			result = False
-
-	return result
-
-# has tomorrow date in line
-# def isTomorrow(line):
-# 	return line.startswith(getTomorrowString())
-
-def isTomorrow(log):
-	return log.startswith( Format.date(getTomorrow()) )
-
-def getTomorrow():
+def getYesterday():
 	return datetime.date.today() - datetime.timedelta(days=1)
-
-# get tomorrow day in format [01.01.2019][23:00:00]
-# def getTomorrowString():
-# 	tmr = datetime.date.today() - datetime.timedelta(days=1)
-# 	strtime = tmr.strftime("[" + '\033[34m' + "%d.%m.%Y" + '\033[0m' + "]")
-# 	return strtime
-
-# Add log string in order list 
-def log(message, theme=""):
-	checkfile()
-	fd = open(getFileName(), 'a')
-	logmsg = getLog(message, theme)
-	fd.write(logmsg)
-	fd.close()
 
 # input positive answer
 def sinput():
@@ -79,59 +70,14 @@ def sinput():
 
 # check exist file '.productivity.ord' in home directory
 def checkfile(isCreate=True):
-	if os.path.exists(getFileName()) == False:
-		print("[warning]: file is not found")
+	if os.path.exists(App.getFileName()) == False:
+		App.warning("file is not found")
 		if isCreate == True:
-			print("you want create file with name " + getFileName() + " ? [Y/n]: ", end='')
+			print("you want create file with name " + App.getFileName() + " ? [Y/n]: ", end='')
 			if sinput() == True:
-				fd = open(getFileName(), 'a'); fd.close()
+				fd = open(App.getFileName(), 'a'); fd.close()
 				return;
 		exit(0)
-
-# get file name
-def getFileName():
-	name = os.environ['HOME'] + '/' + _FILE_NAME_
-	return name
-
-# get log
-def getLog(message, theme):
-	time = getDateTime()
-	theme = getTheme(theme)
-	message = getMessage(message)
-	log_string = time + theme + message + "\n\n"
-	return log_string
-
-# get theme if format string
-def getTheme(theme):
-	theme_string = "\033[33m" + theme + "\033[0m\n"
-	return theme_string
-
-# get message is format string
-def getMessage(message):
-	message_string = "\t\t\t\033[32m" + message + "\033[0m"
-	return message_string
-
-# Print version program and exit
-def version():
-	print("wolf: v%s" % _VERSION)
-	print(" [\033[32m+\033[0m] %s" % "program split on classes")
-	print(" [\033[32m+\033[0m] %s" % "program add option tomorrow")
-	exit(0)
-
-def getDateTime(today=datetime.datetime.today()):
-	return getDate(today) + getTime(today) + "  "
-
-# get time if format string
-def getTime(today=datetime.datetime.today()):
-	# today = datetime.datetime.today()
-	timestr = today.strftime("[" + '\033[36m' + "%H:%M:%S" + "\033[0m" + "]")
-	return timestr
-
-def getDate(today=datetime.datetime.today()):
-	# today = datetime.datetime.today()
-	timestr = today.strftime("[" + '\033[34m' + "%d.%m.%Y" + '\033[0m' + "]")
-	return timestr
-
 
 # @Class (format): for format output
 class Format():
@@ -142,7 +88,7 @@ class Format():
 
 	@staticmethod
 	def message(message):
-		message_string = "\t\t\t\033[32m" + message + "\033[0m" + "\n\n"
+		message_string = "\t\t\t\033[32m" + message + "\033[0m" + "\n"
 		return message_string
 
 	@staticmethod
@@ -158,7 +104,15 @@ class Format():
 		return date.strftime("%a.%d %B.%m %Y %H:%M:%S")
 
 	@staticmethod
-	def datetime(date, time):
+	def log(message, theme=""):
+		time = Format.datetime()
+		theme = Format.theme(theme)
+		message = Format.message(message)
+		format_log = time + theme + message + NL
+		return format_log
+
+	@staticmethod
+	def datetime(date=datetime.datetime.today().date(), time=datetime.datetime.today().time()):
 		day = datetime.datetime(date.year, date.month, date.day, time.hour, time.minute, time.second)
 		res = day.strftime("[" + '\033[34m' + "%d.%m.%Y" + '\033[0m' + "]" + "[" + '\033[36m' + "%H:%M:%S" + "\033[0m" + "] ")
 		return res 
@@ -174,13 +128,27 @@ class Log():
 		self.logs = [""]
 		self.opt = opt
 
+	def add(self, message, theme):
+		checkfile()
+		with open(App.getFileName(), 'a') as fd:
+			logmsg = Format.log(message, theme)
+			fd.write(logmsg)
+
 	def out(self):
+		logs_count = 0 
+		line_count = 0
 		wfilter = Filter(self.opt)
+		# loop in logs
 		for log in self.logs:
 			if wfilter.log(log) == True:
+				logs_count = logs_count + 1
+				# loop in lines
 				for line in log.split('\n'):
 					if wfilter.string(line) == True:
+						line_count = line_count + 1
 						print("%s" % line)
+
+		return [logs_count, line_count]
 
 	def readlogs(self, fd):
 		lines = fd.readlines()
@@ -190,46 +158,31 @@ class Log():
 			else:
 				self.logs[-1] += line
 
+	def order(self):
+		reads = [0, 0]
+		checkfile(False)
+		with open(App.getFileName()) as fd:
+			self.readlogs(fd)
+			reads = self.out()
+
+		if reads[0] <= 0: 	App.message("no records found")
+		else: 				print("today: %s" % Format.strend())
+
 	def __str__(self):
 		res = Format.datetime(self.date, self.time)
 		res += Format.theme(self.theme)
 		res += Format.message(self.message)
 		return res
 
-	# getter and setters
-	# def getDate(self):
-	# 	return self.date 
-
-	# def setDate(self, dt=datetime.datetime.today()):
-	# 	self.date = dt
-
-	# def getTime(self):
-	# 	return self.time 
-
-	# def setTime(self, tm):
-	# 	self.time = tm
-
-	# def getTheme(self):
-	# 	return self.theme 
-
-	# def setTheme(self, thm):
-	# 	self.theme = thm
-
-	# def getMessage(self):
-	# 	return self.message 
-
-	# def setMessage(self, msg):
-	# 	self.message = msg
-
 
 class OrderOption():
 	def __init__(self):
-		self.tommorow = None
+		self.yesterday = None
 
 	def parse(self, opt):
-		# set tomorrow flag
-		if opt.tomorrow == True:
-			self.tommorow = True
+		# set yesterday flag
+		if opt.yesterday == True:
+			self.yesterday = True
 
 
 # Block arguments
@@ -243,25 +196,24 @@ parser.add_argument('-o', '--order', action='store_true', help='output list prod
 parser.add_argument('-v', '--version', action='store_true', help='print version program and exit')
 parser.add_argument('-l', '--log', action='store', help='add log string')
 parser.add_argument('-t', '--theme', action='store', help='scpecified theme')
-parser.add_argument('-r', '--tomorrow', action='store_true', help='display only tomorrow date')
+parser.add_argument('-y', '--yesterday', action='store_true', help='display only yesterday date')
 options = parser.parse_args();
 
 # Parse order options
 orderopt = OrderOption()
 orderopt.parse(options)
 
+# get Log
+log = Log(orderopt)
 
 if options.theme == None:
 	options.theme = "";
 
 if options.version == True:
-	version()
+	App.version()
 elif options.order == True:
-	order(orderopt)
+	log.order()
 elif options.log != None:
-	log(options.log, options.theme)
-
-
-
+	log.add( options.log, options.theme )
 
 exit(0)
